@@ -11,7 +11,7 @@ export const Main = () => {
   const createTodolist = (title: string) => {
     dispatch(createTodolistAC(title))
   }
-
+  console.log(import.meta.env.VITE_API_KEY)
   return (
     <Container maxWidth={"lg"}>
       <Grid container sx={{ mb: "30px" }}>
