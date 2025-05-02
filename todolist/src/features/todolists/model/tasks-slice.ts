@@ -2,8 +2,6 @@ import { createTodolistTC, deleteTodolistTC } from "./todolists-slice"
 import { tasksApi } from "@/features/todolists/api/tasksApi.ts"
 import { createAppSlice } from "@/common/utils"
 import { DomainTask, type UpdateTaskModel } from "@/features/todolists/api/tasksApi.types.ts"
-import { TaskStatus } from "@/common/enums"
-import { RootState } from "@/app/store.ts"
 
 //структура стейта
 // {
@@ -68,32 +66,28 @@ export const tasksSlice = createAppSlice({
     ),
 
     changeTaskStatus: create.asyncThunk(
-      async (arg: { todolistId: string; taskId: string; status: TaskStatus }, { rejectWithValue, getState }) => {
-        const { todolistId, taskId, status } = arg
+      async (task: DomainTask, { rejectWithValue }) => {
+        const model: UpdateTaskModel = {
+          description: task.description,
+          title: task.title,
+          priority: task.priority,
+          startDate: task.startDate,
+          deadline: task.deadline,
+          status: task.status,
+        }
 
         try {
-          const allTasks = (getState() as RootState).tasks
-          const tasksForTodolist = allTasks[todolistId]
-          const task = tasksForTodolist.find((t) => t.id == taskId)
-          // const model: UpdateTaskModel = {
-          //   description: task.description,
-          //   title: task.title,
-          //   priority: task.priority,
-          //   startDate: task.startDate,
-          //   deadline: task.deadline,
-          //   status: e.target.checked ? TaskStatus.Completed : TaskStatus.New,
-          // }
-
-          const res = tasksApi.updateTask({ todolistId, taskId, model: {} as any })
+          const res = await tasksApi.updateTask({ todolistId: task.todoListId, taskId: task.id, model })
+          return res.data.data.item
         } catch (error) {
           return rejectWithValue(null)
         }
       },
       {
         fulfilled: (state, action) => {
-          const task = state[action.payload.todolistId].find((task) => task.id === action.payload.taskId)
+          const task = state[action.payload.todoListId].find((task) => task.id === action.payload.id)
           if (task) {
-            task.status = action.payload.isDone ? TaskStatus.Completed : TaskStatus.New
+            task.status = action.payload.status
           }
         },
       },
