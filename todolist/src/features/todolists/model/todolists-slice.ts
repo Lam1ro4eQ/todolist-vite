@@ -2,6 +2,7 @@ import { createAsyncThunk, PayloadAction } from "@reduxjs/toolkit"
 import { Todolist } from "@/features/todolists/api/todolistsApi.types.ts"
 import { todolistsApi } from "@/features/todolists/api/todolistsApi.ts"
 import { createAppSlice } from "@/common/utils"
+import { changeStatusAC } from "@/app/app-slice.ts"
 
 export type FilterValues = "all" | "active" | "completed"
 
@@ -17,10 +18,12 @@ export const todolistsSlice = createAppSlice({
       const todolist = state.find((todolist) => todolist.id === action.payload.id)
       if (todolist) todolist.filter = action.payload.filter
     }),
-    fetchTodolostsTC: create.asyncThunk(
+    fetchTodolistsTC: create.asyncThunk(
       async (_arg, thunkAPI) => {
         try {
+          thunkAPI.dispatch(changeStatusAC({ status: "loading" }))
           const res = await todolistsApi.getTodolists()
+          thunkAPI.dispatch(changeStatusAC({ status: "idle" }))
           return { todolists: res.data }
         } catch (error) {
           return thunkAPI.rejectWithValue(null)
@@ -55,7 +58,7 @@ export const todolistsSlice = createAppSlice({
   },
 })
 
-export const { changeTodolistFilterAC, fetchTodolostsTC } = todolistsSlice.actions
+export const { changeTodolistFilterAC, fetchTodolistsTC } = todolistsSlice.actions
 
 export const todolistsReducer = todolistsSlice.reducer
 export const { selectTodolists } = todolistsSlice.selectors
@@ -86,18 +89,23 @@ export const deleteTodolistTC = createAsyncThunk(
   },
 )
 
-export const createTodolistTC = createAsyncThunk(`${todolistsSlice.name}/createTodolistTC`, async (title: string, { rejectWithValue }) => {
-  try {
-    const res = await todolistsApi.createTodolist(title)
-    const newTodolist: DomainTodolist = {
-      id: res.data.data.item.id,
-      title: res.data.data.item.title,
-      addedDate: res.data.data.item.addedDate,
-      order: res.data.data.item.order,
-      filter: "all",
+export const createTodolistTC = createAsyncThunk(
+  `${todolistsSlice.name}/createTodolistTC`,
+  async (title: string, { rejectWithValue, dispatch }) => {
+    try {
+      dispatch(changeStatusAC({ status: "loading" }))
+      const res = await todolistsApi.createTodolist(title)
+      const newTodolist: DomainTodolist = {
+        id: res.data.data.item.id,
+        title: res.data.data.item.title,
+        addedDate: res.data.data.item.addedDate,
+        order: res.data.data.item.order,
+        filter: "all",
+      }
+      dispatch(changeStatusAC({ status: "idle" }))
+      return newTodolist
+    } catch (error) {
+      return rejectWithValue(null)
     }
-    return newTodolist
-  } catch (error) {
-    return rejectWithValue(null)
-  }
-})
+  },
+)
