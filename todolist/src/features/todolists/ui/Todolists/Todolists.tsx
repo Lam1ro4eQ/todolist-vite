@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from "@/common/hooks"
 import { TodolistItem } from "./TodolistItem/TodolistItem"
-import Grid from "@mui/material/Grid2"
+import Grid from "@mui/material/Grid"
 import Paper from "@mui/material/Paper"
 import { useEffect } from "react"
 import { DomainTodolist, fetchTodolistsTC, selectTodolists } from "@/features/todolists/model/todolists-slice.ts"

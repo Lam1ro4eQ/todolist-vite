@@ -2,8 +2,9 @@ import { createTodolist, deleteTodolist } from "./todolists-slice"
 import { tasksApi } from "@/features/todolists/api/tasksApi.ts"
 import { createAppSlice } from "@/common/utils"
 import { DomainTask, type UpdateTaskModel } from "@/features/todolists/api/tasksApi.types.ts"
-import { changeStatusAC } from "@/app/app-slice.ts"
+import { changeErrorAC, changeStatusAC } from "@/app/app-slice.ts"
 import { RootState } from "@/app/store.ts"
+import { ResultCode } from "@/common/enums"
 
 //структура стейта
 // {
@@ -34,9 +35,18 @@ export const tasksSlice = createAppSlice({
     createTaskTC: create.asyncThunk(
       async ({ todolistId, title }: { todolistId: string; title: string }, thunkAPI) => {
         try {
+          thunkAPI.dispatch(changeStatusAC({ status: "loading" }))
           const res = await tasksApi.createTask({ todolistId, title })
-          return { task: res.data.data.item }
+          if (res.data.resultCode === ResultCode.Success) {
+            thunkAPI.dispatch(changeStatusAC({ status: "succeeded" }))
+            return { task: res.data.data.item }
+          } else {
+            thunkAPI.dispatch(changeErrorAC({ error: res.data.messages[0] }))
+            thunkAPI.dispatch(changeStatusAC({ status: "failed" }))
+            return thunkAPI.rejectWithValue(null)
+          }
         } catch (error) {
+          thunkAPI.dispatch(changeStatusAC({ status: "failed" }))
           return thunkAPI.rejectWithValue(null)
         }
       },
@@ -68,7 +78,14 @@ export const tasksSlice = createAppSlice({
     ),
 
     updateTask: create.asyncThunk(
-      async (payload: { todolistId: string; taskId: string; domainModel: Partial<UpdateTaskModel> }, thunkAPI) => {
+      async (
+        payload: {
+          todolistId: string
+          taskId: string
+          domainModel: Partial<UpdateTaskModel>
+        },
+        thunkAPI,
+      ) => {
         const { todolistId, taskId, domainModel } = payload
 
         const allTodolistTasks = (thunkAPI.getState() as RootState).tasks[todolistId]
