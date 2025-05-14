@@ -41,11 +41,12 @@ export const tasksSlice = createAppSlice({
             thunkAPI.dispatch(changeStatusAC({ status: "succeeded" }))
             return { task: res.data.data.item }
           } else {
-            thunkAPI.dispatch(changeErrorAC({ error: res.data.messages[0] }))
+            thunkAPI.dispatch(changeErrorAC({ error: res.data.messages ? res.data.messages[0] : "Some error occurred" }))
             thunkAPI.dispatch(changeStatusAC({ status: "failed" }))
             return thunkAPI.rejectWithValue(null)
           }
-        } catch (error) {
+        } catch (error: any) {
+          thunkAPI.dispatch(changeErrorAC({ error: error.messages }))
           thunkAPI.dispatch(changeStatusAC({ status: "failed" }))
           return thunkAPI.rejectWithValue(null)
         }
