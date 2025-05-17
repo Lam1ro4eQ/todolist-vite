@@ -1,6 +1,6 @@
 import { createTodolist, deleteTodolist } from "./todolists-slice"
 import { tasksApi } from "@/features/todolists/api/tasksApi.ts"
-import { createAppSlice } from "@/common/utils"
+import { createAppSlice, handleServerNetworkError } from "@/common/utils"
 import { DomainTask, type UpdateTaskModel } from "@/features/todolists/api/tasksApi.types.ts"
 import { changeErrorAC, changeStatusAC } from "@/app/app-slice.ts"
 import { RootState } from "@/app/store.ts"
@@ -46,8 +46,7 @@ export const tasksSlice = createAppSlice({
             return thunkAPI.rejectWithValue(null)
           }
         } catch (error: any) {
-          thunkAPI.dispatch(changeErrorAC({ error: error.messages }))
-          thunkAPI.dispatch(changeStatusAC({ status: "failed" }))
+          handleServerNetworkError(error, thunkAPI.dispatch)
           return thunkAPI.rejectWithValue(null)
         }
       },
@@ -166,7 +165,7 @@ export const tasksSlice = createAppSlice({
   extraReducers: (builder) => {
     builder
       .addCase(createTodolist.fulfilled, (state, action) => {
-        state[action.payload.id] = []
+        state[action.payload.todolist.id] = []
       })
       .addCase(deleteTodolist.fulfilled, (state, action) => {
         delete state[action.payload.id]
