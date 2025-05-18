@@ -35,7 +35,7 @@ export const Tasks = ({ todolist }: Props) => {
       {filteredTasks && filteredTasks.length === 0 ? (
         <p>Тасок нет</p>
       ) : (
-        <List>{filteredTasks?.map((task: DomainTask) => <TaskItem key={task.id} task={task} todolistId={id} />)}</List>
+        <List>{filteredTasks?.map((task: DomainTask) => <TaskItem key={task.id} task={task} todolist={todolist} />)}</List>
       )}
     </>
   )

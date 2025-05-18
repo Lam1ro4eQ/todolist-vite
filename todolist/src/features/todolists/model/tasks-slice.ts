@@ -1,8 +1,8 @@
 import { createTodolist, deleteTodolist } from "./todolists-slice"
 import { tasksApi } from "@/features/todolists/api/tasksApi.ts"
-import { createAppSlice, handleServerNetworkError } from "@/common/utils"
+import { createAppSlice, handleAppError, handleServerNetworkError } from "@/common/utils"
 import { DomainTask, type UpdateTaskModel } from "@/features/todolists/api/tasksApi.types.ts"
-import { changeErrorAC, changeStatusAC } from "@/app/app-slice.ts"
+import { changeStatusAC } from "@/app/app-slice.ts"
 import { RootState } from "@/app/store.ts"
 import { ResultCode } from "@/common/enums"
 
@@ -41,11 +41,10 @@ export const tasksSlice = createAppSlice({
             thunkAPI.dispatch(changeStatusAC({ status: "succeeded" }))
             return { task: res.data.data.item }
           } else {
-            thunkAPI.dispatch(changeErrorAC({ error: res.data.messages ? res.data.messages[0] : "Some error occurred" }))
-            thunkAPI.dispatch(changeStatusAC({ status: "failed" }))
+            handleAppError(res.data, thunkAPI.dispatch)
             return thunkAPI.rejectWithValue(null)
           }
-        } catch (error: any) {
+        } catch (error) {
           handleServerNetworkError(error, thunkAPI.dispatch)
           return thunkAPI.rejectWithValue(null)
         }

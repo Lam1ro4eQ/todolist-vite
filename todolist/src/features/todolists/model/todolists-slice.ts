@@ -1,7 +1,7 @@
 import { Todolist } from "@/features/todolists/api/todolistsApi.types.ts"
 import { todolistsApi } from "@/features/todolists/api/todolistsApi.ts"
-import { createAppSlice, handleServerNetworkError } from "@/common/utils"
-import { changeErrorAC, changeStatusAC } from "@/app/app-slice.ts"
+import { createAppSlice, handleAppError, handleServerNetworkError } from "@/common/utils"
+import { changeStatusAC } from "@/app/app-slice.ts"
 import { RequestStatus } from "@/common/types"
 import { ResultCode } from "@/common/enums"
 
@@ -69,19 +69,11 @@ export const todolistsSlice = createAppSlice({
         try {
           dispatch(changeStatusAC({ status: "loading" }))
           const res = await todolistsApi.createTodolist(title)
-          // const newTodolist: DomainTodolist = {
-          //   id: res.data.data.item.id,
-          //   title: res.data.data.item.title,
-          //   addedDate: res.data.data.item.addedDate,
-          //   order: res.data.data.item.order,
-          //   filter: "all",
-          //   entityStatus: "idle",
-          // }
           if (res.data.resultCode === ResultCode.Success) {
+            dispatch(changeStatusAC({ status: "succeeded" }))
             return { todolist: res.data.data.item }
           } else {
-            dispatch(changeErrorAC({ error: res.data.messages.length ? res.data.messages[0] : "Some error occurred" }))
-            dispatch(changeStatusAC({ status: "failed" }))
+            handleAppError(res.data, dispatch)
             return rejectWithValue(null)
           }
         } catch (error: any) {

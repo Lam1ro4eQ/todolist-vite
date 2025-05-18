@@ -19,7 +19,6 @@ export const appSlice = createSlice({
     }),
     changeErrorAC: create.reducer<{ error: string | null }>((state, action) => {
       state.error = action.payload.error
-      console.log(1111)
     }),
   }),
   selectors: {
