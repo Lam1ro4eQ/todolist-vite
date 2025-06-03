@@ -9,11 +9,14 @@ import FormGroup from "@mui/material/FormGroup"
 import FormLabel from "@mui/material/FormLabel"
 import Grid from "@mui/material/Grid"
 import TextField from "@mui/material/TextField"
+import { useForm } from "react-hook-form"
 
 export const Login = () => {
   const themeMode = useAppSelector(selectThemeMode)
 
   const theme = getTheme(themeMode)
+
+  const { register, handleSubmit, watch, formState: { errors } } = useForm();
 
   return (
     <Grid container justifyContent={"center"}>
@@ -39,9 +42,9 @@ export const Login = () => {
           </p>
         </FormLabel>
         <FormGroup>
-          <TextField label="Email" margin="normal" />
-          <TextField type="password" label="Password" margin="normal" />
-          <FormControlLabel label="Remember me" control={<Checkbox />} />
+          <TextField label="Email" margin="normal" {...register("example")} />
+          <TextField type="password" label="Password" margin="normal" {...register("example")} />
+          <FormControlLabel label="Remember me" control={<Checkbox />} {...register("example")} />
           <Button type="submit" variant="contained" color="primary">
             Login
           </Button>
