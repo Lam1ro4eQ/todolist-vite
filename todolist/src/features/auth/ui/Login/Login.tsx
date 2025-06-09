@@ -8,12 +8,7 @@ import Grid from "@mui/material/Grid"
 import TextField from "@mui/material/TextField"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 import styles from "./Login.module.css"
-
-type Inputs = {
-  email: string
-  password: string
-  rememberMe: boolean
-}
+import { Inputs } from "@/features/auth/lib/schemas/loginSchema.ts"
 
 export const Login = () => {
   const {
@@ -22,7 +17,7 @@ export const Login = () => {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<Inputs>({ defaultValues: { email: "test@test.com", password: "123123123", rememberMe: false } })
+  } = useForm<Inputs>({ defaultValues: { email: "", password: "", rememberMe: false } })
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     reset()
@@ -82,7 +77,7 @@ export const Login = () => {
                 <Controller
                   name={"rememberMe"}
                   control={control}
-                  render={({ field: { onChange, value } }) => <Checkbox onChange={(e) => onChange(e.target.checked)} checked={value} />}
+                  render={({ field: { value, ...rest } }) => <Checkbox {...rest} checked={value} />}
                 />
               }
             />
