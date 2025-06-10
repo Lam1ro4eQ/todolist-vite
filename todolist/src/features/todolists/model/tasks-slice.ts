@@ -1,7 +1,7 @@
 import { createTodolist, deleteTodolist } from "./todolists-slice"
 import { tasksApi } from "@/features/todolists/api/tasksApi.ts"
 import { createAppSlice, handleAppError, handleServerNetworkError } from "@/common/utils"
-import { DomainTask, type UpdateTaskModel } from "@/features/todolists/api/tasksApi.types.ts"
+import { DomainTask, domainTaskSchema, type UpdateTaskModel } from "@/features/todolists/api/tasksApi.types.ts"
 import { changeStatusAC } from "@/app/app-slice.ts"
 import { RootState } from "@/app/store.ts"
 import { ResultCode } from "@/common/enums"
@@ -19,9 +19,13 @@ export const tasksSlice = createAppSlice({
     fetchTasks: create.asyncThunk(
       async (todolistId: string, thunkAPI) => {
         try {
+          thunkAPI.dispatch(changeStatusAC({ status: "loading" }))
           const res = await tasksApi.getTasks(todolistId)
-          return { tasks: res.data.items, todolistId }
+          const tasks = domainTaskSchema.array().parse(res.data.items)
+          thunkAPI.dispatch(changeStatusAC({ status: "succeeded" }))
+          return { todolistId, tasks }
         } catch (error) {
+          console.log(error)
           return thunkAPI.rejectWithValue(null)
         }
       },
