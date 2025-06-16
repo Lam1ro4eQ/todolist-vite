@@ -21,10 +21,11 @@ export const tasksSlice = createAppSlice({
         try {
           thunkAPI.dispatch(changeStatusAC({ status: "loading" }))
           const res = await tasksApi.getTasks(todolistId)
-          const tasks = domainTaskSchema.array().parse(res.data.items)
+          domainTaskSchema.array().parse(res.data.items)
           thunkAPI.dispatch(changeStatusAC({ status: "succeeded" }))
-          return { todolistId, tasks }
+          return { todolistId, tasks: res.data.items }
         } catch (error) {
+          handleServerNetworkError(error, thunkAPI.dispatch)
           console.log(error)
           return thunkAPI.rejectWithValue(null)
         }

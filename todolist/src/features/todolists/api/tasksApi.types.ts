@@ -26,7 +26,7 @@ export const domainTaskSchema = z.object({
   id: z.string(),
   todoListId: z.string(),
   order: z.number(),
-  addedDate: z.string(),
+  addedDate: z.string().datetime({ message: "invalid datetime string!", local: true }),
 })
 
 export type DomainTask = z.infer<typeof domainTaskSchema>
