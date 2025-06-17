@@ -129,41 +129,6 @@ export const tasksSlice = createAppSlice({
         },
       },
     ),
-
-    changeTaskStatus_: create.asyncThunk(
-      async (task: DomainTask, { rejectWithValue }) => {
-        const model: UpdateTaskModel = {
-          description: task.description,
-          title: task.title,
-          priority: task.priority,
-          startDate: task.startDate,
-          deadline: task.deadline,
-          status: task.status,
-        }
-
-        try {
-          const res = await tasksApi.updateTask({ todolistId: task.todoListId, taskId: task.id, model })
-          return res.data.data.item
-        } catch (error) {
-          return rejectWithValue(null)
-        }
-      },
-      {
-        fulfilled: (state, action) => {
-          const task = state[action.payload.todoListId].find((task) => task.id === action.payload.id)
-          if (task) {
-            task.status = action.payload.status
-          }
-        },
-      },
-    ),
-
-    changeTaskTitleAC_: create.reducer<{ todolistId: string; taskId: string; title: string }>((state, action) => {
-      const task = state[action.payload.todolistId].find((task) => task.id === action.payload.taskId)
-      if (task) {
-        task.title = action.payload.title
-      }
-    }),
   }),
 
   extraReducers: (builder) => {

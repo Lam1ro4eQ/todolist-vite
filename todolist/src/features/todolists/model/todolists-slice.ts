@@ -1,4 +1,4 @@
-import { Todolist } from "@/features/todolists/api/todolistsApi.types.ts"
+import { Todolist, todolistSchema } from "@/features/todolists/api/todolistsApi.types.ts"
 import { todolistsApi } from "@/features/todolists/api/todolistsApi.ts"
 import { createAppSlice, handleAppError, handleServerNetworkError } from "@/common/utils"
 import { changeStatusAC } from "@/app/app-slice.ts"
@@ -29,8 +29,14 @@ export const todolistsSlice = createAppSlice({
         try {
           thunkAPI.dispatch(changeStatusAC({ status: "loading" }))
           const res = await todolistsApi.getTodolists()
+          todolistSchema.array().parse(res.data)
           thunkAPI.rejectWithValue(null)
           return { todolists: res.data }
+        } catch (error: any) {
+          handleServerNetworkError(error, thunkAPI.dispatch)
+          console.table(error)
+          thunkAPI.dispatch(changeStatusAC({ status: "failed" }))
+          return thunkAPI.rejectWithValue(null)
         } finally {
           thunkAPI.dispatch(changeStatusAC({ status: "idle" }))
         }
