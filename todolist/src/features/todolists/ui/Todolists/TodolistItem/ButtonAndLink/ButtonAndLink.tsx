@@ -1,6 +1,4 @@
 import { ComponentProps, ElementType } from "react"
-import Button from "@mui/material/Button"
-import a from "@mui/material/Button"
 
 type Props<E extends ElementType = ElementType> = {
   children: string

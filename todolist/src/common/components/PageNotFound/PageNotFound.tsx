@@ -1,12 +1,14 @@
 import styles from "./PageNotFound.module.css"
-import { ButtonAndLink } from "@/features/todolists/ui/Todolists/TodolistItem/ButtonAndLink/ButtonAndLink.tsx"
+import { Path } from "@/common/routing/Routing.tsx"
+import { Link } from "react-router"
+import { Button, Container } from "@mui/material"
 
 export const PageNotFound = () => (
-  <>
+  <Container sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
     <h1 className={styles.title}>404</h1>
     <h2 className={styles.subtitle}>page not found</h2>
-    <ButtonAndLink as="a" href="http://localhost:3000/">
-      Перейти на главную страницу
-    </ButtonAndLink>
-  </>
+    <Button variant="contained" component={Link} to={Path.Main} sx={{ width: "330px", mt: "20px" }}>
+      Вернуться на главную
+    </Button>
+  </Container>
 )
