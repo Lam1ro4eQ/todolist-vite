@@ -14,7 +14,6 @@ import { loginTC, selectIsLoggedIn } from "@/features/auth/model/auth-slice.ts"
 import { useAppDispatch, useAppSelector } from "@/common/hooks"
 import { Navigate, useNavigate } from "react-router"
 import { Path } from "@/common/routing/Routing"
-import { useEffect } from "react"
 
 export const Login = () => {
   const {
