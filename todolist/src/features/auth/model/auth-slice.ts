@@ -70,11 +70,9 @@ export const authSlice = createAppSlice({
           const res = await authApi.me()
           if (res.data.resultCode === ResultCode.Success) {
             return { isLoggedIn: true }
-            dispatch(changeStatusAC({ status: "succeeded" }))
           } else {
             handleAppError(res.data, dispatch)
             return rejectWithValue(null)
-            dispatch(changeStatusAC({ status: "failed" }))
           }
         } catch (error) {
           handleServerNetworkError(error, dispatch)
@@ -92,5 +90,5 @@ export const authSlice = createAppSlice({
 })
 
 export const { selectIsLoggedIn } = authSlice.selectors
-export const { loginTC, logoutTC } = authSlice.actions
+export const { loginTC, logoutTC, meTC } = authSlice.actions
 export const authReducer = authSlice.reducer

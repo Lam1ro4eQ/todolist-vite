@@ -12,8 +12,7 @@ import { LoginInputs, loginSchema } from "@/features/auth/lib/schemas/loginSchem
 import { zodResolver } from "@hookform/resolvers/zod"
 import { loginTC, selectIsLoggedIn } from "@/features/auth/model/auth-slice.ts"
 import { useAppDispatch, useAppSelector } from "@/common/hooks"
-import { Navigate, useNavigate } from "react-router"
-import { Path } from "@/common/routing/Routing"
+import { useNavigate } from "react-router"
 
 export const Login = () => {
   const {
@@ -37,9 +36,9 @@ export const Login = () => {
   }
 
   // 1 вариает
-  if (isLoggedIn) {
-    return <Navigate to={Path.Main} />
-  }
+  // if (isLoggedIn) {
+  //   return <Navigate to={Path.Main} />
+  // }
 
   // 2 вариает
   // useEffect(() => {}, [isLoggedIn])
