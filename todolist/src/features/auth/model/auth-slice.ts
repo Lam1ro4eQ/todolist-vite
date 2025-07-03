@@ -4,6 +4,7 @@ import { changeStatusAC } from "@/app/app-slice.ts"
 import { authApi } from "@/features/auth/api/authApi.ts"
 import { AUTH_TOKEN } from "@/common/constants"
 import { ResultCode } from "@/common/enums"
+import { resetTodolists } from "@/features/todolists/model/todolists-slice.ts"
 
 export const authSlice = createAppSlice({
   name: "auth",
@@ -47,6 +48,7 @@ export const authSlice = createAppSlice({
           if (res.data.resultCode === ResultCode.Success) {
             dispatch(changeStatusAC({ status: "succeeded" }))
             localStorage.removeItem(AUTH_TOKEN)
+            dispatch(resetTodolists())
             return { isLoggedIn: false }
           } else {
             handleAppError(res.data, dispatch)

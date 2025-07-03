@@ -1,4 +1,4 @@
-import { createTodolist, deleteTodolist } from "./todolists-slice"
+import { createTodolist, deleteTodolist, resetTodolists } from "./todolists-slice"
 import { tasksApi } from "@/features/todolists/api/tasksApi.ts"
 import { createAppSlice, handleAppError, handleServerNetworkError } from "@/common/utils"
 import { DomainTask, domainTaskSchema, type UpdateTaskModel } from "@/features/todolists/api/tasksApi.types.ts"
@@ -138,6 +138,9 @@ export const tasksSlice = createAppSlice({
       })
       .addCase(deleteTodolist.fulfilled, (state, action) => {
         delete state[action.payload.id]
+      })
+      .addCase(resetTodolists, (_state, _action) => {
+        return {}
       })
   },
 })
