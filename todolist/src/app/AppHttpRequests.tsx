@@ -2,7 +2,7 @@ import { CreateItemForm, EditableSpan } from "@/common/components"
 import { TaskStatus } from "@/common/enums"
 import { tasksApi } from "@/features/todolists/api/tasksApi"
 import type { DomainTask, UpdateTaskModel } from "@/features/todolists/api/tasksApi.types"
-import { todolistsApi } from "@/features/todolists/api/todolistsApi"
+import { _todolistsApi } from "@/features/todolists/api/todolistsApi"
 import type { Todolist } from "@/features/todolists/api/todolistsApi.types"
 import Checkbox from "@mui/material/Checkbox"
 import { type ChangeEvent, type CSSProperties, useEffect, useState } from "react"
@@ -12,7 +12,7 @@ export const AppHttpRequests = () => {
   const [tasks, setTasks] = useState<Record<string, DomainTask[]>>({})
 
   useEffect(() => {
-    todolistsApi.getTodolists().then((res) => {
+    _todolistsApi.getTodolists().then((res) => {
       const todolists = res.data
       setTodolists(todolists)
       todolists.forEach((todolist) => {
@@ -24,7 +24,7 @@ export const AppHttpRequests = () => {
   }, [])
 
   const createTodolist = (title: string) => {
-    todolistsApi.createTodolist(title).then((res) => {
+    _todolistsApi.createTodolist(title).then((res) => {
       const newTodolist = res.data.data.item
       setTodolists([newTodolist, ...todolists])
       setTasks({ ...tasks, [newTodolist.id]: [] })
@@ -32,7 +32,7 @@ export const AppHttpRequests = () => {
   }
 
   const deleteTodolist = (id: string) => {
-    todolistsApi.deleteTodolist(id).then(() => {
+    _todolistsApi.deleteTodolist(id).then(() => {
       setTodolists(todolists.filter((todolist) => todolist.id !== id))
       delete tasks[id]
       setTasks({ ...tasks })
@@ -40,7 +40,7 @@ export const AppHttpRequests = () => {
   }
 
   const changeTodolistTitle = (id: string, title: string) => {
-    todolistsApi.changeTodolistTitle({ id, title }).then(() => {
+    _todolistsApi.changeTodolistTitle({ id, title }).then(() => {
       setTodolists(todolists.map((todolist) => (todolist.id === id ? { ...todolist, title } : todolist)))
     })
   }

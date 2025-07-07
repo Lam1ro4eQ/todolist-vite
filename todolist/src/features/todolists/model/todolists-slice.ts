@@ -1,5 +1,5 @@
 import { Todolist, todolistSchema } from "@/features/todolists/api/todolistsApi.types.ts"
-import { todolistsApi } from "@/features/todolists/api/todolistsApi.ts"
+import { _todolistsApi } from "@/features/todolists/api/todolistsApi.ts"
 import { createAppSlice, handleAppError, handleServerNetworkError } from "@/common/utils"
 import { changeStatusAC } from "@/app/app-slice.ts"
 import { RequestStatus } from "@/common/types"
@@ -28,7 +28,7 @@ export const todolistsSlice = createAppSlice({
       async (_arg, thunkAPI) => {
         try {
           thunkAPI.dispatch(changeStatusAC({ status: "loading" }))
-          const res = await todolistsApi.getTodolists()
+          const res = await _todolistsApi.getTodolists()
           todolistSchema.array().parse(res.data)
           thunkAPI.rejectWithValue(null)
           return { todolists: res.data }
@@ -53,7 +53,7 @@ export const todolistsSlice = createAppSlice({
       async (arg: { id: string; title: string }, thunkAPI) => {
         try {
           thunkAPI.dispatch(changeStatusAC({ status: "loading" }))
-          await todolistsApi.changeTodolistTitle(arg)
+          await _todolistsApi.changeTodolistTitle(arg)
           return arg
         } catch (error) {
           thunkAPI.dispatch(changeStatusAC({ status: "failed" }))
@@ -74,7 +74,7 @@ export const todolistsSlice = createAppSlice({
       async (title: string, { dispatch, rejectWithValue }) => {
         try {
           dispatch(changeStatusAC({ status: "loading" }))
-          const res = await todolistsApi.createTodolist(title)
+          const res = await _todolistsApi.createTodolist(title)
           if (res.data.resultCode === ResultCode.Success) {
             dispatch(changeStatusAC({ status: "succeeded" }))
             return { todolist: res.data.data.item }
@@ -98,7 +98,7 @@ export const todolistsSlice = createAppSlice({
         try {
           thunkAPI.dispatch(changeTodolistEntityStatusAC({ entityStatus: "loading", id }))
           thunkAPI.dispatch(changeStatusAC({ status: "loading" }))
-          await todolistsApi.deleteTodolist(id)
+          await _todolistsApi.deleteTodolist(id)
           return { id }
         } catch (error) {
           thunkAPI.dispatch(changeStatusAC({ status: "failed" }))
