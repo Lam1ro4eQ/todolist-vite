@@ -1,8 +1,9 @@
 import { instance } from "@/common/instance"
 import type { BaseResponse } from "@/common/types"
 import type { Todolist } from "./todolistsApi.types"
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
+import { BaseQueryArg, createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import { AUTH_TOKEN } from "@/common/constants"
+import { DomainTodolist } from "@/features/todolists/model/todolists-slice.ts"
 
 export const _todolistsApi = {
   getTodolists() {
@@ -30,8 +31,27 @@ export const todolistsApi = createApi({
     },
   }),
   endpoints: (build) => ({
-    getTodolists: build.query<any[], void>({
-      query: () => "todo-lists",
+    getTodolists: build.query<DomainTodolist[], void>({
+      query: () => {
+        return {
+          method: "GET",
+          url: "/todo-lists",
+        }
+      },
+      transformResponse: (todolists: Todolist[], meta, arg) => {
+        return todolists.map((todo) => {
+          return { ...todo, filter: "all", entityStatus: "idle" }
+        })
+      },
+    }),
+    createTodolist: build.mutation<BaseResponse<{ item: Todolist }>, string>({
+      query: (title) => {
+        return {
+          method: "post",
+          url: "/todo-lists",
+          body: { title },
+        }
+      },
     }),
   }),
 })
