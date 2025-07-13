@@ -55,4 +55,4 @@ export const todolistsApi = createApi({
     }),
   }),
 })
-export const { useGetTodolistsQuery } = todolistsApi
+export const { useGetTodolistsQuery, useCreateTodolistMutation } = todolistsApi
