@@ -1,7 +1,7 @@
 import { instance } from "@/common/instance"
 import type { BaseResponse } from "@/common/types"
 import type { Todolist } from "./todolistsApi.types"
-import { BaseQueryArg, createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import { AUTH_TOKEN } from "@/common/constants"
 import { DomainTodolist } from "@/features/todolists/model/todolists-slice.ts"
 
@@ -53,6 +53,28 @@ export const todolistsApi = createApi({
         }
       },
     }),
+    deleteTodolist: build.mutation<BaseResponse, string>({
+      query: (id) => {
+        return {
+          method: "delete",
+          url: `/todo-lists/${id}`,
+        }
+      },
+    }),
+    changeTodolistTitle: build.mutation<BaseResponse, { id: string; title: string }>({
+      query: ({ id, title }) => {
+        return {
+          method: "put",
+          url: `/todo-lists/${id}`,
+          body: { title },
+        }
+      },
+    }),
   }),
 })
-export const { useGetTodolistsQuery, useCreateTodolistMutation } = todolistsApi
+export const {
+  useGetTodolistsQuery,
+  useCreateTodolistMutation,
+  useDeleteTodolistMutation,
+  useChangeTodolistTitleMutation,
+} = todolistsApi
