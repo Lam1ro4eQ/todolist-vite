@@ -10,8 +10,11 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form"
 import styles from "./Login.module.css"
 import { LoginInputs, loginSchema } from "@/features/auth/lib/schemas/loginSchema.ts"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { loginTC } from "@/features/auth/model/auth-slice.ts"
 import { useAppDispatch } from "@/common/hooks"
+import { useLoginMutation } from "@/features/auth/api/authApi.ts"
+import { ResultCode } from "@/common/enums"
+import { setIsLoggedIn } from "@/app/app-slice.ts"
+import { AUTH_TOKEN } from "@/common/constants"
 
 export const Login = () => {
   const {
@@ -25,11 +28,18 @@ export const Login = () => {
     resolver: zodResolver(loginSchema),
   })
 
-  const dispatch = useAppDispatch()
+  const [LoginMutation] = useLoginMutation()
 
+  const dispatch = useAppDispatch()
   const onSubmit: SubmitHandler<LoginInputs> = (data) => {
-    dispatch(loginTC(data))
-    reset()
+    LoginMutation(data).then((res) => {
+      if (res.data?.resultCode === ResultCode.Success) {
+        localStorage.setItem(AUTH_TOKEN, res.data.data.token)
+        dispatch(setIsLoggedIn({ isLoggedIn: true }))
+      }
+      // dispatch(loginTC(data))
+      reset()
+    })
   }
 
   return (

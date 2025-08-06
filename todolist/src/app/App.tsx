@@ -4,32 +4,28 @@ import { useAppDispatch, useAppSelector } from "@/common/hooks"
 import { getTheme } from "@/common/theme"
 import CssBaseline from "@mui/material/CssBaseline"
 import { ThemeProvider } from "@mui/material/styles"
-import { selectThemeMode } from "@/app/app-slice.ts"
+import { selectThemeMode, setIsLoggedIn } from "@/app/app-slice.ts"
 import { ErrorSnackbar } from "@/common/components/ErrorSnackbar/ErrorSnackbar.tsx"
 import { Routing } from "@/common/routing/Routing.tsx"
 import { useEffect, useState } from "react"
-import { meTC } from "@/features/auth/model/auth-slice.ts"
 import { CircularProgress } from "@mui/material"
+import { useMeQuery } from "@/features/auth/api/authApi.ts"
+import { ResultCode } from "@/common/enums"
 
 export const App = () => {
   const themeMode = useAppSelector(selectThemeMode)
 
   const theme = getTheme(themeMode)
-
   const dispatch = useAppDispatch()
-
   const [isInitialized, setIsInitialized] = useState(false)
 
+  const { data, isLoading } = useMeQuery()
+
   useEffect(() => {
-    dispatch(meTC())
-      .unwrap() // для обраболтки ошибки в rtk
-      .then(() => {
-        setIsInitialized(true)
-      })
-      .catch((err) => {
-        setIsInitialized(true)
-      })
-  }) // раннее прерывание чтобы не отрисовывался лишний раз тот же логин
+    if (isLoading) return
+    setIsInitialized(true)
+    if (data?.resultCode === ResultCode.Success) dispatch(setIsLoggedIn({ isLoggedIn: true }))
+  }, [isLoading, data])
 
   if (!isInitialized) {
     return (

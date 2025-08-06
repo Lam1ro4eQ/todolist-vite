@@ -1,4 +1,4 @@
-import { changeThemeModeAC, selectStatus, selectThemeMode } from "@/app/app-slice"
+import { changeThemeModeAC, selectIsLoggedIn, selectStatus, selectThemeMode, setIsLoggedIn } from "@/app/app-slice"
 import { useAppDispatch, useAppSelector } from "@/common/hooks"
 import { containerSx } from "@/common/styles"
 import { getTheme } from "@/common/theme"
@@ -10,21 +10,31 @@ import IconButton from "@mui/material/IconButton"
 import Switch from "@mui/material/Switch"
 import Toolbar from "@mui/material/Toolbar"
 import { LinearProgress } from "@mui/material"
-import { logoutTC, selectIsLoggedIn } from "@/features/auth/model/auth-slice.ts"
+import { useLogoutMutation } from "@/features/auth/api/authApi.ts"
+import { ResultCode } from "@/common/enums"
+import { AUTH_TOKEN } from "@/common/constants"
+import { resetTodolists } from "@/features/todolists/model/todolists-slice.ts"
 
 export const Header = () => {
   const themeMode = useAppSelector(selectThemeMode)
   const status = useAppSelector(selectStatus)
   const dispatch = useAppDispatch()
   const isLoggedIn = useAppSelector(selectIsLoggedIn)
-
   const theme = getTheme(themeMode)
+  const [LogoutMutation] = useLogoutMutation()
 
   const changeMode = () => {
     dispatch(changeThemeModeAC({ themeMode: themeMode === "light" ? "dark" : "light" }))
   }
   const logoutHandler = () => {
-    dispatch(logoutTC())
+    LogoutMutation().then((res) => {
+      if (res.data?.resultCode === ResultCode.Success) {
+        localStorage.removeItem(AUTH_TOKEN)
+        dispatch(setIsLoggedIn({ isLoggedIn: false }))
+        dispatch(resetTodolists())
+      }
+    })
+    // dispatch(logoutTC())
   }
 
   return (
