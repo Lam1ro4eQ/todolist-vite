@@ -1,6 +1,6 @@
 import { CreateItemForm, EditableSpan } from "@/common/components"
 import { TaskStatus } from "@/common/enums"
-import { tasksApi } from "@/features/todolists/api/tasksApi"
+import { _tasksApi } from "@/features/todolists/api/tasksApi"
 import type { DomainTask, UpdateTaskModel } from "@/features/todolists/api/tasksApi.types"
 import { _todolistsApi } from "@/features/todolists/api/todolistsApi"
 import type { Todolist } from "@/features/todolists/api/todolistsApi.types"
@@ -16,7 +16,7 @@ export const AppHttpRequests = () => {
       const todolists = res.data
       setTodolists(todolists)
       todolists.forEach((todolist) => {
-        tasksApi.getTasks(todolist.id).then((res) => {
+        _tasksApi.getTasks(todolist.id).then((res) => {
           setTasks((prevTasksState) => ({ ...prevTasksState, [todolist.id]: res.data.items }))
         })
       })
@@ -46,14 +46,14 @@ export const AppHttpRequests = () => {
   }
 
   const createTask = (todolistId: string, title: string) => {
-    tasksApi.createTask({ todolistId, title }).then((res) => {
+    _tasksApi.createTask({ todolistId, title }).then((res) => {
       const newTask = res.data.data.item
       setTasks({ ...tasks, [todolistId]: [newTask, ...tasks[todolistId]] })
     })
   }
 
   const deleteTask = (todolistId: string, taskId: string) => {
-    tasksApi.deleteTask({ todolistId, taskId }).then(() => {
+    _tasksApi.deleteTask({ todolistId, taskId }).then(() => {
       setTasks({ ...tasks, [todolistId]: tasks[todolistId].filter((task) => task.id !== taskId) })
     })
   }
@@ -70,7 +70,7 @@ export const AppHttpRequests = () => {
       status: e.target.checked ? TaskStatus.Completed : TaskStatus.New,
     }
 
-    tasksApi.updateTask({ todolistId, taskId: task.id, model }).then(() => {
+    _tasksApi.updateTask({ todolistId, taskId: task.id, model }).then(() => {
       setTasks({ ...tasks, [todolistId]: tasks[todolistId].map((t) => (t.id === task.id ? { ...t, ...model } : t)) })
     })
   }
@@ -87,7 +87,7 @@ export const AppHttpRequests = () => {
       title,
     }
 
-    tasksApi.updateTask({ todolistId, taskId: task.id, model }).then(() => {
+    _tasksApi.updateTask({ todolistId, taskId: task.id, model }).then(() => {
       setTasks({ ...tasks, [todolistId]: tasks[todolistId].map((t) => (t.id === task.id ? { ...t, ...model } : t)) })
     })
   }

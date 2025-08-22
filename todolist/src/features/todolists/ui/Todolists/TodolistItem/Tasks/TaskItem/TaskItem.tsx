@@ -1,15 +1,14 @@
 import { EditableSpan } from "@/common/components/EditableSpan/EditableSpan"
-import { useAppDispatch } from "@/common/hooks"
-import { deleteTask, updateTask } from "@/features/todolists/model/tasks-slice.ts"
 import DeleteIcon from "@mui/icons-material/Delete"
 import Checkbox from "@mui/material/Checkbox"
 import IconButton from "@mui/material/IconButton"
 import ListItem from "@mui/material/ListItem"
 import type { ChangeEvent } from "react"
 import { getListItemSx } from "./TaskItem.styles"
-import { DomainTask } from "@/features/todolists/api/tasksApi.types.ts"
+import { DomainTask, UpdateTaskModel } from "@/features/todolists/api/tasksApi.types.ts"
 import { TaskStatus } from "@/common/enums"
 import { DomainTodolist } from "@/features/todolists/model/todolists-slice.ts"
+import { useDeleteTaskMutation, useUpdateTaskMutation } from "@/features/todolists/api/tasksApi.ts"
 
 type Props = {
   task: DomainTask
@@ -17,19 +16,37 @@ type Props = {
 }
 
 export const TaskItem = ({ task, todolist: { id: todolistId, entityStatus } }: Props) => {
-  const dispatch = useAppDispatch()
+  const [updateTask] = useUpdateTaskMutation()
+  const [deleteTask] = useDeleteTaskMutation()
 
   const deleteTaskHandler = () => {
-    dispatch(deleteTask({ todolistId, taskId: task.id }))
+    deleteTask({ todolistId, taskId: task.id })
   }
 
   const changeTaskStatusHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    const newStatusValue = e.currentTarget.checked ? TaskStatus.Completed : TaskStatus.New
-    dispatch(updateTask({ todolistId: task.todoListId, taskId: task.id, domainModel: { status: newStatusValue } }))
+    const status = e.currentTarget.checked ? TaskStatus.Completed : TaskStatus.New
+    const model: UpdateTaskModel = {
+      status,
+      title: task.title,
+      deadline: task.deadline,
+      description: task.description,
+      priority: task.priority,
+      startDate: task.startDate,
+    }
+    updateTask({ taskId: task.id, todolistId: todolistId, model })
   }
 
   const changeTaskTitle = (title: string) => {
-    dispatch(updateTask({ todolistId, taskId: task.id, domainModel: { title } }))
+    const model: UpdateTaskModel = {
+      status: task.status,
+      title,
+      deadline: task.deadline,
+      description: task.description,
+      priority: task.priority,
+      startDate: task.startDate,
+    }
+
+    updateTask({ taskId: task.id, todolistId: todolistId, model })
   }
 
   return (

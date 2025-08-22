@@ -1,8 +1,9 @@
 import { instance } from "@/common/instance"
 import type { BaseResponse } from "@/common/types"
 import type { DomainTask, GetTasksResponse, UpdateTaskModel } from "./tasksApi.types"
+import { baseApi } from "@/app/baseApi.ts"
 
-export const tasksApi = {
+export const _tasksApi = {
   getTasks(todolistId: string) {
     return instance.get<GetTasksResponse>(`/todo-lists/${todolistId}/tasks`)
   },
@@ -19,3 +20,51 @@ export const tasksApi = {
     return instance.delete<BaseResponse>(`/todo-lists/${todolistId}/tasks/${taskId}`)
   },
 }
+
+export const tasksApi = baseApi.injectEndpoints({
+  endpoints: (build) => ({
+    getTasks: build.query<GetTasksResponse, string>({
+      query: (todolistId) => {
+        return {
+          method: "GET",
+          url: `/todo-lists/${todolistId}/tasks`,
+        }
+      },
+      providesTags: ["Task"],
+    }),
+    createTask: build.mutation<BaseResponse<{ item: DomainTask }>, { todolistId: string; title: string }>({
+      query: ({ todolistId, title }) => {
+        return {
+          method: "POST",
+          url: `/todo-lists/${todolistId}/tasks`,
+          body: { title },
+        }
+      },
+      invalidatesTags: ["Task"],
+    }),
+    updateTask: build.mutation<
+      BaseResponse<{ item: DomainTask }>,
+      { todolistId: string; taskId: string; model: Partial<UpdateTaskModel> }
+    >({
+      query: ({ todolistId, taskId, model }) => {
+        return {
+          method: "PUT",
+          url: `/todo-lists/${todolistId}/tasks/${taskId}`,
+          body: model,
+        }
+      },
+      invalidatesTags: ["Task"],
+    }),
+    deleteTask: build.mutation<BaseResponse, { todolistId: string; taskId: string }>({
+      query: ({ todolistId, taskId }) => {
+        return {
+          method: "delete",
+          url: `/todo-lists/${todolistId}/tasks/${taskId}`,
+        }
+      },
+      invalidatesTags: ["Task"],
+    }),
+  }),
+})
+
+export const { useGetTasksQuery, useCreateTaskMutation, useUpdateTaskMutation, useDeleteTaskMutation } = tasksApi

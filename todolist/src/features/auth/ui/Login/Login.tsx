@@ -31,6 +31,7 @@ export const Login = () => {
   const [LoginMutation] = useLoginMutation()
 
   const dispatch = useAppDispatch()
+
   const onSubmit: SubmitHandler<LoginInputs> = (data) => {
     LoginMutation(data).then((res) => {
       if (res.data?.resultCode === ResultCode.Success) {
