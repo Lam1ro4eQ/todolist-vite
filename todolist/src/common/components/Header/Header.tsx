@@ -13,7 +13,7 @@ import { LinearProgress } from "@mui/material"
 import { useLogoutMutation } from "@/features/auth/api/authApi.ts"
 import { ResultCode } from "@/common/enums"
 import { AUTH_TOKEN } from "@/common/constants"
-import { resetTodolists } from "@/features/todolists/model/todolists-slice.ts"
+import { baseApi } from "@/app/baseApi.ts"
 
 export const Header = () => {
   const themeMode = useAppSelector(selectThemeMode)
@@ -27,14 +27,19 @@ export const Header = () => {
     dispatch(changeThemeModeAC({ themeMode: themeMode === "light" ? "dark" : "light" }))
   }
   const logoutHandler = () => {
-    LogoutMutation().then((res) => {
-      if (res.data?.resultCode === ResultCode.Success) {
-        localStorage.removeItem(AUTH_TOKEN)
-        dispatch(setIsLoggedIn({ isLoggedIn: false }))
-        dispatch(resetTodolists())
-      }
-    })
-    // dispatch(logoutTC())
+    LogoutMutation()
+      .then((res) => {
+        if (res.data?.resultCode === ResultCode.Success) {
+          localStorage.removeItem(AUTH_TOKEN)
+          dispatch(setIsLoggedIn({ isLoggedIn: false }))
+        }
+      })
+      .then(() => {
+        // dispatch(todolistsApi.util.invalidateTags(["Todolist"]))
+        // dispatch(tasksApi.util.invalidateTags(["Task"]))
+        dispatch(baseApi.util.invalidateTags(["Task", "Todolist"]))
+        // dispatch(baseApi.util.resetApiState())
+      })
   }
 
   return (
