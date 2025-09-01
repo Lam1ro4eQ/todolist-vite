@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit"
+import { createSlice, isFulfilled, isPending, isRejected } from "@reduxjs/toolkit"
 import { RequestStatus } from "@/common/types"
 
 type ThemeMode = "light" | "dark"
@@ -30,6 +30,17 @@ export const appSlice = createSlice({
     selectStatus: (state) => state.status,
     selectError: (state) => state.error,
     selectIsLoggedIn: (state) => state.isLoggedIn,
+  },
+  extraReducers: (builder) => {
+    builder.addMatcher(isPending, (state) => {
+      state.status = "loading"
+    })
+    builder.addMatcher(isFulfilled, (state) => {
+      state.status = "succeeded"
+    })
+    builder.addMatcher(isRejected, (state) => {
+      state.status = "failed"
+    })
   },
 })
 
