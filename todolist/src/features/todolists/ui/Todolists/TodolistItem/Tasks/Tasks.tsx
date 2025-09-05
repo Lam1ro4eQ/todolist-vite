@@ -4,6 +4,7 @@ import { DomainTodolist } from "@/features/todolists/model/todolists-slice.ts"
 import { DomainTask } from "@/features/todolists/api/tasksApi.types.ts"
 import { TaskStatus } from "@/common/enums"
 import { useGetTasksQuery } from "@/features/todolists/api/tasksApi.ts"
+import { TasksSkeleton } from "@/features/todolists/ui/Todolists/TodolistItem/Tasks/TasksSkeleton/TasksSkeleton.tsx"
 
 type Props = {
   todolist: DomainTodolist
@@ -13,6 +14,10 @@ export const Tasks = ({ todolist }: Props) => {
   const { id, filter } = todolist
 
   const data = useGetTasksQuery(id)
+
+  if (data.isLoading) {
+    return <TasksSkeleton />
+  }
 
   let filteredTasks = data?.data?.items
   if (filter === "active") {

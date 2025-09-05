@@ -58,7 +58,7 @@ export const TaskItem = ({ task, todolist: { id: todolistId, entityStatus } }: P
           disabled={entityStatus === "loading"}
         />
         <EditableSpan value={task.title} onChange={changeTaskTitle} entityStatus={entityStatus} />
-        <p>{new Date(task.addedDate).toLocaleDateString()}</p>
+        {/*<p>{new Date(task.addedDate).toLocaleDateString()}</p>*/}
       </div>
       <IconButton onClick={deleteTaskHandler} disabled={entityStatus === "loading"}>
         <DeleteIcon />

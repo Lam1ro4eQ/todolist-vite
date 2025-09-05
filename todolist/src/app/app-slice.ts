@@ -1,5 +1,7 @@
 import { createSlice, isFulfilled, isPending, isRejected } from "@reduxjs/toolkit"
 import { RequestStatus } from "@/common/types"
+import { todolistsApi } from "@/features/todolists/api/todolistsApi.ts"
+import { tasksApi } from "@/features/todolists/api/tasksApi.ts"
 
 type ThemeMode = "light" | "dark"
 
@@ -32,7 +34,13 @@ export const appSlice = createSlice({
     selectIsLoggedIn: (state) => state.isLoggedIn,
   },
   extraReducers: (builder) => {
-    builder.addMatcher(isPending, (state) => {
+    builder.addMatcher(isPending, (state, action) => {
+      if (
+        todolistsApi.endpoints.getTodolists.matchPending(action) ||
+        tasksApi.endpoints.getTasks.matchPending(action)
+      ) {
+        return
+      }
       state.status = "loading"
     })
     builder.addMatcher(isFulfilled, (state) => {
