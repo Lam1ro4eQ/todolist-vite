@@ -3,7 +3,7 @@ import { AUTH_TOKEN } from "@/common/constants"
 
 export const baseApi = createApi({
   baseQuery: async (args, api, extraOptions) => {
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    // await new Promise((resolve) => setTimeout(resolve, 2000))
 
     return fetchBaseQuery({
       baseUrl: import.meta.env.VITE_BASE_URL,
