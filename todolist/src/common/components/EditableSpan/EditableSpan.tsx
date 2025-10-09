@@ -1,7 +1,7 @@
 import TextField from "@mui/material/TextField"
 import { type ChangeEvent, useState } from "react"
-import { DomainTodolist } from "@/features/todolists/model/todolists-slice.ts"
 import { RequestStatus } from "@/common/types"
+import { DomainTodolist } from "@/features/todolists/lib/types"
 
 type Props = {
   value: string

@@ -2,6 +2,7 @@ import { instance } from "@/common/instance"
 import type { BaseResponse } from "@/common/types"
 import type { DomainTask, GetTasksResponse, UpdateTaskModel } from "./tasksApi.types"
 import { baseApi } from "@/app/baseApi.ts"
+import { error } from "console"
 
 export const _tasksApi = {
   getTasks(todolistId: string) {
@@ -30,7 +31,9 @@ export const tasksApi = baseApi.injectEndpoints({
           url: `/todo-lists/${todolistId}/tasks`,
         }
       },
-      providesTags: ["Task"],
+      providesTags: (result, _error, _arg, _meta) => {
+        return result ? [...result.items.map((task) => ({ type: "Task", id: task.id }) as const)] : ["Task"]
+      },
     }),
     createTask: build.mutation<BaseResponse<{ item: DomainTask }>, { todolistId: string; title: string }>({
       query: ({ todolistId, title }) => {
@@ -40,7 +43,9 @@ export const tasksApi = baseApi.injectEndpoints({
           body: { title },
         }
       },
-      invalidatesTags: ["Task"],
+      invalidatesTags: (result, _error) => {
+        return [{ type: "Task", id: result?.data.item.id }]
+      },
     }),
     updateTask: build.mutation<
       BaseResponse<{ item: DomainTask }>,
@@ -53,7 +58,7 @@ export const tasksApi = baseApi.injectEndpoints({
           body: model,
         }
       },
-      invalidatesTags: ["Task"],
+      invalidatesTags: (_result, _error, { taskId }) => [{ type: "Task", id: taskId }],
     }),
     deleteTask: build.mutation<BaseResponse, { todolistId: string; taskId: string }>({
       query: ({ todolistId, taskId }) => {
@@ -62,7 +67,7 @@ export const tasksApi = baseApi.injectEndpoints({
           url: `/todo-lists/${todolistId}/tasks/${taskId}`,
         }
       },
-      invalidatesTags: ["Task"],
+      invalidatesTags: (_result, _error, { taskId }) => [{ type: "Task", id: taskId }],
     }),
   }),
 })
