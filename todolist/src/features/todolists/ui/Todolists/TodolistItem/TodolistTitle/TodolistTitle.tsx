@@ -21,22 +21,18 @@ export const TodolistTitle = ({ todolist }: Props) => {
   const [changeTodolistTitleMutation] = useChangeTodolistTitleMutation()
   const [deleteTodolistMutation] = useDeleteTodolistMutation()
 
-  const changeTodolistStatus = (entityStatus: RequestStatus) => {
-    dispatch(
+  const deleteTodolistHandler = async () => {
+    const patchResult = dispatch(
       todolistsApi.util.updateQueryData("getTodolists", undefined, (data) => {
         const todolist = data.find((todolist) => todolist.id === id)
-        if (todolist) todolist.entityStatus = entityStatus
+        if (todolist) todolist.entityStatus = "loading"
       }),
     )
-  }
-
-  const deleteTodolistHandler = () => {
-    changeTodolistStatus("loading")
-    deleteTodolistMutation(id)
-      .unwrap()
-      .catch(() => {
-        changeTodolistStatus("idle")
-      })
+    try {
+      await deleteTodolistMutation(id)
+    } catch (error) {
+      patchResult.undo()
+    }
   }
 
   const changeTodolistTitleHandler = (title: string) => {
