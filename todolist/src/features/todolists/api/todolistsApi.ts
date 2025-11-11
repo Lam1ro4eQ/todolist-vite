@@ -1,8 +1,8 @@
 import { instance } from "@/common/instance"
 import type { BaseResponse } from "@/common/types"
 import type { Todolist } from "./todolistsApi.types"
-import { DomainTodolist } from "@/features/todolists/model/todolists-slice.ts"
 import { baseApi } from "@/app/baseApi.ts"
+import { DomainTodolist } from "../lib/types"
 
 export const _todolistsApi = {
   getTodolists() {
@@ -47,6 +47,19 @@ export const todolistsApi = baseApi.injectEndpoints({
       invalidatesTags: ["Todolist"],
     }),
     deleteTodolist: build.mutation<BaseResponse, string>({
+      async onQueryStarted(id, { queryFulfilled, dispatch }) {
+        const patchResult = dispatch(
+          todolistsApi.util.updateQueryData("getTodolists", undefined, (data) => {
+            const index = data.findIndex((todo) => todo.id === id)
+            if (index != -1) data.splice(index, 1)
+          }),
+        )
+        try {
+          await queryFulfilled
+        } catch (error) {
+          patchResult.undo()
+        }
+      },
       query: (id) => {
         return {
           method: "delete",
