@@ -49,19 +49,27 @@ export const tasksApi = baseApi.injectEndpoints({
       BaseResponse<{ item: DomainTask }>,
       { todolistId: string; taskId: string; model: Partial<UpdateTaskModel> }
     >({
-      async onQueryStarted({ todolistId, taskId, model }, { queryFulfilled, dispatch }) {
-        const patchResult = dispatch(
-          tasksApi.util.updateQueryData("getTasks", { id: todolistId, params: { page: 1 } }, (data) => {
-            const index = data.items.findIndex((task) => task.id === taskId)
-            if (index !== -1) {
-              data.items[index] = { ...data.items[index], ...model }
-            }
-          }),
-        )
+      async onQueryStarted({ todolistId, taskId, model }, { queryFulfilled, dispatch, getState }) {
+        const args = tasksApi.util.selectCachedArgsForQuery(getState(), "getTasks")
+        let patchResults: any[] = []
+        args.forEach(({ params }) => {
+          patchResults.push(
+            dispatch(
+              tasksApi.util.updateQueryData("getTasks", { id: todolistId, params: { page: params.page } }, (state) => {
+                const index = state.items.findIndex((task) => task.id === taskId)
+                if (index !== -1) {
+                  state.items[index] = { ...state.items[index], ...model }
+                }
+              }),
+            ),
+          )
+        })
         try {
           await queryFulfilled
-        } catch (error) {
-          patchResult.undo()
+        } catch {
+          patchResults.forEach((patchResult) => {
+            patchResult.undo()
+          })
         }
       },
       query: ({ todolistId, taskId, model }) => {
